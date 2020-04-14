@@ -1,0 +1,13 @@
+{
+  "answers": {
+    "appName": "test-app",
+    "useTypeScript": true,
+    "useLess": true,
+    "installDeps": true,
+    "type": "Survey",
+    "name": "Akin"
+  },
+  "options": {
+    "onconflict": "force"
+  }
+}
