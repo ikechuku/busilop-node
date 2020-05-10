@@ -1,0 +1,10 @@
+{
+  "generator-jhipster-blueprint": {
+    "promptValues": {
+      "githubName": "ikechuku",
+      "authorName": "Ikechuku Ukpa",
+      "authorEmail": "sir_ik@yahoo.com",
+      "authorUrl": "ikechuku.netlify.com"
+    }
+  }
+}
