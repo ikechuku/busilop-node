@@ -2,66 +2,60 @@ var express = require("express");
 var router = express.Router();
 var fs = require('fs');
 var cmd = require('node-cmd')
-var ejs = require('ejs');
+var Promise = require('bluebird')
+
+var exec = require('child_process').exec;
 
 
 router.post("/", async function (req, res, err) {
 
-  // var data = req.body
-  var data = req.body.schema['components']
+  var data = req.body
+  var schema = req.body.schema['components']
 
-  fs.writeFile("form.html", data, (err) => {
-    if (err) console.log(err);
-    console.log("Successfully Written to File.");
-    console.log(data);
+  fs.readFile(('form.txt').toString(), 'utf8', function (err, data) {
+    if (err) {
+      return console.log(err);
+    }
+    var result = data.replace(/__schema__/g, JSON.stringify(schema));
+    // console.log(schema.toString());
+
+    // write the template to a html file
+    fs.writeFile("./generator-jhipster-clientBlueprint/generators/client/templates/_form.html", result, (err) => {
+      if (err) console.log(err);
+      console.log("Successfully Written to Blueprint Template File.");
+      console.log(result);
+    });
   });
 
-  // var promise = new Promise(function (resolve, reject) {
-  //   cmd.get(
-  //     'cd output && jhipster',
-  //     function (err, stdout, stderr) {
 
+  //
+  /**
+   * Executes a shell command and return it as a Promise.
+   * @param cmd {string}
+   * @return {Promise<string>}
+   */
+  function execShellCommand(cmd) {
+    const exec = require('child_process').exec;
+    return new Promise((resolve, reject) => {
+      exec(cmd, (error, stdout, stderr) => {
+        if (error) {
+          console.warn(error);
+        }
+        console.log(stdout);
 
-  //       if (err) {
+        resolve(stdout ? stdout : stderr);
+      });
+    });
+  }
 
-  //         reject(err);
-  //       } else {
-  //         console.log(stdout)
-  //         resolve("done");
-  //       }
-  //     }
-  //   );
-  // })
+  // Run the generator blueprint asychronously
+  const runGenerator = await execShellCommand('cd output && jhipster -d --blueprints clientblueprint --skip-checks --skip-install');
+  console.log(runGenerator);
 
-  // await promise
+  console.log("The scaffolding has been Completed Successfully!");
+
   res.send("Completed!")
-
 });
 
 
 module.exports = router;
-
-// console.log("running Jhipster blueprint, please wait...");
-
-// Code to Create files 
-
-// var fs = require('fs');
-
-// raw_data = req.body;
-// data = raw_data.data
-
-// if (data['tables']) {
-//   console.log(data.template)
-// }
-
-// if (data['tables']) {
-//   console.log(data.tables)
-//   try {
-//     fs.writeFile(pagefile, data.tables, function (err) {
-//       if (err) throw err;
-//       console.log('Saved!');
-//     });
-//   } catch (error) {
-//     console.log();
-//   }
-// }

@@ -1,1 +1,37 @@
-[object Object]
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/formiojs@latest/dist/formio.full.min.css"
+    />
+    <script src="https://unpkg.com/formiojs@latest/dist/formio.full.min.js"></script>
+    <script type="text/javascript"> Formio.createForm(document.getElementById('formio'), 'https://examples.form.io/example') .then(function(form) { // Prevent the submission from going to the form.io server. form.nosubmit = true;
+      // Triggered when they click the submit button.
+      form.on('submit', function(submission) {
+        console.log(submission);
+        alert('Submission sent to custom endpoint. See developer console.');
+        return fetch('https://hookb.in/ZrRRbJBe', {
+            body: JSON.stringify(submission),
+            headers: {
+              'content-type': 'application/json'
+            },
+            method: 'POST',
+            mode: 'cors',
+          })
+          .then(response => {
+            form.emit('submitDone', submission)
+            response.json()
+          })
+      });
+      }); </script>
+  </head>
+  <body>
+    <div id="formio"></div>
+  </body>
+</html>
+
+

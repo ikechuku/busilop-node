@@ -1,0 +1,22 @@
+<html>
+
+<head>
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
+  <link rel='stylesheet' href='https://unpkg.com/formiojs@latest/dist/formio.full.min.css'>
+  <script src='https://unpkg.com/formiojs@latest/dist/formio.full.min.js'></script>
+
+</head>
+
+<body>
+  <div id="components"  form-schema=<%=test%>
+    <p> <%=schema %></p>
+  </div>
+  <div id="formio"></div>></div>
+</body>
+<script type='text/javascript'>
+  window.onload = function () {
+    Formio.createForm(document.getElementById('formio'), $component
+    );
+  };
+</script>
+</html>
