@@ -3,6 +3,7 @@ var router = express.Router();
 var fs = require("fs");
 var Promise = require("bluebird");
 var cmd = require("node-cmd");
+var server = require("../bin/www");
 const jdlService = require("../services/jdl-service");
 const cmdService = require("../services/cmd-service");
 
@@ -29,6 +30,10 @@ router.post("/", async function (req, res, err) {
     );
   });
 
+  console.log("Service to Handle Setup Form");
+
+  server.io.emit("loadingService", "loading");
+
   // Write yo-rc configuration
   let cleanName = JSON.stringify(config.baseName).replace(/['"]+/g, "");
   fs.readFile("./config.json".toString(), "utf8", function (err, dta) {
@@ -45,10 +50,16 @@ router.post("/", async function (req, res, err) {
     });
   });
 
+  server.io.emit(
+    "loadingService",
+    "Running Service to Handle Setup Form (1/5)"
+  );
+  server.io.emit("loadingService", "Writing yo-rc.son file");
+
   const Entities = req.body["store"].entities;
 
   const Relationships = req.body["store"].relationships;
-  console.log(req.body["store"]);
+  // console.log(req.body["store"]);
 
   // write the template to a JDL file
   var result = "";
@@ -63,6 +74,9 @@ router.post("/", async function (req, res, err) {
     console.log("Creating JDL File.");
   });
 
+  console.log("Service to Create JDL");
+  server.io.emit("loadingService", "Creating JDL Entities step:(1/3)");
+
   // const linkBlueprint = await cmdService.execShellCommand('cd output && npm link generator-jhipster-clientblueprint');
   // console.log(linkBlueprint);
   // console.log("Linking Generator");
@@ -72,12 +86,13 @@ router.post("/", async function (req, res, err) {
     "cd output && jhipster -d --blueprints clientblueprint --skip-checks --skip-install"
   );
   console.log(runGen);
+  console.log("Service to Create Blueprint");
 
   const runJdlGen = await cmdService.execShellCommand(
     "cd output && jhipster import-jdl ./entities.jdl --regenerate --force"
   );
   console.log(runJdlGen);
-
+  console.log("Service to Handle JDL");
   // Modify the package.json
   fs.readFile("./output/package.json".toString(), "utf8", function (err, data) {
     if (err) {
@@ -92,6 +107,7 @@ router.post("/", async function (req, res, err) {
       console.log("...");
     });
   });
+  server.io.emit("loadingService", "Running Blueprint Generator step:(2/3)");
 
   // Modify the yml file to set a password for postgres
 
@@ -106,8 +122,10 @@ router.post("/", async function (req, res, err) {
       let xstring = "username: " + cleanName;
       const setusr = setpwd.split(xstring).join("username: blog");
 
-      let dbstring = "url: jdbc:postgresql://localhost:5432/"+cleanName
-      const setdb = setusr.split(dbstring).join("url: jdbc:postgresql://localhost:5432/blog");
+      let dbstring = "url: jdbc:postgresql://localhost:5432/" + cleanName;
+      const setdb = setusr
+        .split(dbstring)
+        .join("url: jdbc:postgresql://localhost:5432/blog");
       fs.writeFile(
         "./output/src/main/resources/config/application-prod.yml",
         setdb,
@@ -122,16 +140,23 @@ router.post("/", async function (req, res, err) {
   const generateJar = await cmdService.execShellCommand(
     "cd output && ./mvnw -Pprod clean verify"
   );
+
+  server.io.emit(
+    "loadingService",
+    "generating executable JAR file from application-prod.yml step:(3/3)"
+  );
+
   console.log(generateJar);
   console.log("JAR file Generated Successfully!");
+  console.log("Service to generate executable JAR file");
 
   const buildcmd =
     "cd output/target && java -jar " + cleanName + "-0.0.1-SNAPSHOT.jar";
-
+  setTimeout(function () {
+    server.io.emit("loadingService", "complete");
+  }, 60000);
   cmdService.execShellCommand(buildcmd);
   console.log("build complete!");
-
-  res.send("Application is being deployed, Pls visit this link in 2 minutes");
 });
 
 module.exports = router;

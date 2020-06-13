@@ -47,18 +47,36 @@ const createJDLField = (fields) => {
  * @return {string}
  */
 module.exports.createJDLRelationship = (relObj) => {
-  var entity_string = `relationship _rel_type_ {
-_entity_{_field} to _target_
-}
-`;
   let rel_type = relObj["type"];
   let entity = relObj["entity"];
   let field = relObj["field"];
   let target_entity = relObj["target_entity"];
 
+  // for one to many
+  var entity_string_for_one_to_many = `relationship _rel_type_ {
+_target_ to _entity_{_field}
+}
+`;
+  // for oneToOne and ManyToOne
+  var entity_string_for_one_to_one = `relationship _rel_type_ {
+_entity_{_field} to _target_
+}
+`;
+
+  let entity_string;
+  if (rel_type === "ManyToMany") {
+    rel_type = "ManyToOne";
+  }
+
+  if (rel_type === "OneToMany") {
+    entity_string = entity_string_for_one_to_many;
+  } else {
+    entity_string = entity_string_for_one_to_one;
+  }
+
   let output = entity_string.replace(/_rel_type_/g, rel_type);
   output = output.replace(/_entity_/g, entity);
-  output = output.replace(/_field/g, field);
+  output = output.replace(/_field/g, target_entity.toLowerCase());
   output = output.replace(/_target_/g, target_entity);
 
   return output;

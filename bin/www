@@ -36,8 +36,9 @@ io.on("connection", (socket) => {
   });
 });
 
+exports.io = io;
 
-const getApiAndEmit = socket => {
+const getApiAndEmit = (socket) => {
   const response = new Date();
   // Emitting a new message. Will be consumed by the client
   socket.emit("FromAPI", response);
@@ -50,6 +51,7 @@ const getApiAndEmit = socket => {
 server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
+// console.log("App is running");
 
 /**
  * Normalize a port into a number, string, or false.

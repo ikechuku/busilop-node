@@ -1,0 +1,42 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: busilopnodeapp
+  labels:
+    app: node
+spec:
+  selector:
+    app: node
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busilopnodeapp
+  labels:
+    app: node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node
+  template:
+    metadata:
+      labels:
+        app: node
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/id: "busilopnodeapp"
+        dapr.io/port: "5000"
+    spec:
+      containers:
+        - name: node
+          image: ikechuku/busilop-node
+          ports:
+            - containerPort: 5000
+          imagePullPolicy: Always
