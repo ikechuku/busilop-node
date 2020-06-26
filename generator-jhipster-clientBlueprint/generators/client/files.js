@@ -3,7 +3,7 @@ module.exports = {
 };
 
 function writeFiles() {
-    this.copy('_form.html', 'form.html');
+    this.copy('routes.tsx', 'src/main/webapp/app/routes.tsx');
 }
 
 	
