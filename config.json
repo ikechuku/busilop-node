@@ -30,14 +30,14 @@
     "dtoSuffix": "DTO",
     "otherModules": [
       {
-        "name": "generator-jhipster-myblueprint",
+        "name": "generator-jhipster-busilopnodeblueprint",
         "version": "1.0.2"
       }
     ],
     "enableTranslation": false,
     "blueprints": [
       {
-        "name": "generator-jhipster-myblueprint",
+        "name": "generator-jhipster-busilopnodeblueprint",
         "version": "1.0.2"
       }
     ]
