@@ -11,97 +11,111 @@ const cmdService = require("../services/cmd-service");
 router.post("/", async function (req, res, err) {
   const schema = req.body["store"].form["components"];
   const config = req.body["store"].config;
-
-  // Write form to Template
-  // fs.readFile("form.txt".toString(), "utf8", function (err, data) {
-  //   if (err) {
-  //     return console.log(err);
-  //   }
-  //   const result = data.replace(/__schema__/g, JSON.stringify(schema));
-
-  //   // write the template to a html file
-  //   fs.writeFile(
-  //     "./generator-jhipster-busilopnodeblueprint/generators/client/templates/react/home/home.tsx.ejs",
-  //     result,
-  //     (err) => {
-  //       if (err) console.log(err);
-  //       console.log("Writing to Blueprint Template File...");
-  //       // console.log(result);
-  //     }
-  //   );
-  // });
+  const outputDir = "./output/" + uuid.v4();
 
   server.io.emit("loadingService", "loading");
 
-  const outputDir = "./output/" + uuid.v4();
-  console.log(outputDir);
+  console.log(schema);
 
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir);
   }
 
   // Write yo-rc configuration
-  let cleanName = JSON.stringify(config.baseName).replace(/['"]+/g, "");
+  const cleanName = JSON.stringify(config.baseName).replace(/['"]+/g, "");
+  const themeName = JSON.stringify(config.clientTheme).replace(/['"]+/g, "");
+
   fs.readFile("./config.json".toString(), "utf8", function (err, dta) {
     if (err) {
       return console.log(err);
     }
+
     const conf = dta.replace(/blog/g, cleanName);
-    let config_file = outputDir + "/.yo-rc.json";
+    let theme = conf.replace(/__theme__/g, themeName);
+    // theme = dta.replace(/__variant__/g, "");
+
+    // if (themeName == "darkly") {
+    //   theme = dta.replace(/__variant__/g, "dark");
+
+    // }
+
+    // let config_file = outputDir + "/.yo-rc.json";
     // write the template to a html file
-    fs.writeFile(outputDir + "/.yo-rc.json", conf, (err) => {
+    fs.writeFile(outputDir + "/.yo-rc.json", theme, (err) => {
       if (err) console.log(err);
-      console.log("Writing to .yo-rc configuration file...");
+      console.log("Writing files from Blueprint ...");
       // console.log(result);
     });
   });
 
-  server.io.emit(
-    "loadingService",
-    "Running Service to Handle Setup Form (1/5)"
-  );
-  server.io.emit("loadingService", "Writing yo-rc.son file");
-  console.log("Building ...");
-let gen_command =  "cd " +outputDir+  " && jhipster -d --blueprints busilopnodeblueprint --skip-checks"
-  // Run the generator blueprint asychronously
-  const runGen = await cmdService.execShellCommand(
-    gen_command
-  );
-  console.log(runGen);
-  console.log("Installing Dependencies ...");
+  // server.io.emit(
+  //   "loadingService",
+  //   "Running Service to Handle Setup Form (1/5)"
+  // );
+  // server.io.emit("loadingService", "Running Blueprint Generator step:(2/3)");
+  // console.log("Building ...");
+  // let gen_command =
+  //   "cd " +
+  //   outputDir +
+  //   " && jhipster -d --blueprints busilopnodeblueprint --skip-checks";
+  // // Run the generator blueprint asychronously
+  // const runGen = await cmdService.execShellCommand(gen_command);
+  // console.log(runGen);
+  // console.log("Installing Dependencies ...");
 
-  fs.readFile(outputDir + "/package.json".toString(), "utf8", function (
-    err,
-    data
-  ) {
-    if (err) {
-      return console.log(err);
-    }
-    // remove the blueprint from the package.json file
-    const rmvpackage = data.replace(
-      / "generator-jhipster-busilopnodeblueprint": "1.0.2",/g,
-      ""
-    );
-    fs.writeFile(outputDir + "package.json", rmvpackage, (err) => {
-      if (err) console.log(err);
-      console.log("...");
-    });
-  });
-  server.io.emit("loadingService", "Running Blueprint Generator step:(2/3)");
+  // fs.readFile(
+  //   outputDir + "/src/main/webapp/app/modules/home/home.tsx".toString(),
+  //   "utf8",
+  //   function (err, data) {
+  //     if (err) {
+  //       return console.log(err);
+  //     }
+  //     // remove the blueprint from the package.json file
+  //     const writeSchema = data.replace(
+  //       /_schema_code_/g,
+  //       JSON.stringify(schema)
+  //     );
+  //     fs.writeFile(
+  //       outputDir + "/src/main/webapp/app/modules/home/home.tsx",
+  //       writeSchema,
+  //       (err) => {
+  //         if (err) console.log(err);
+  //         console.log("Loading docker-compose");
+  //       }
+  //     );
+  //   }
+  // );
 
-  console.log("Installing Dependencies ...");
+  // fs.readFile(outputDir + "/package.json".toString(), "utf8", function (
+  //   err,
+  //   data
+  // ) {
+  //   if (err) {
+  //     return console.log(err);
+  //   }
+  //   // remove the blueprint from the package.json file
+  //   const rmvpackage = data.replace(
+  //     / "generator-jhipster-busilopnodeblueprint": "1.0.2",/g,
+  //     ""
+  //   );
+  //   fs.writeFile(outputDir + "package.json", rmvpackage, (err) => {
+  //     if (err) console.log(err);
+  //     console.log("...");
+  //   });
+  // });
+  // server.io.emit("loadingService", "building docker images");
 
-  let compose_command = "cd " + outputDir + " && docker-compose up";
-  const runCompose = await cmdService.execShellCommand(compose_command);
+  // let compose_command =
+  //   "cd " +
+  //   outputDir +
+  //   " && docker-compose -f docker-compose-base.yml -f docker-compose.yml up ";
+  // const runCompose = await cmdService.execShellCommand(compose_command);
 
-  console.log(runCompose);
-
-  server.io.emit(
-    "loadingService",
-    "generating executable JAR file from application-prod.yml step:(3/3)"
-  );
+  // server.io.emit("loadingService", "Installing dependencies");
+  // console.log(runCompose);
 
   console.log("===== Finished running backend services");
+  server.io.emit("loadingService", "Finished running backend services");
 });
 
 module.exports = router;

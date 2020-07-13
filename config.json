@@ -22,7 +22,7 @@
     "useSass": true,
     "clientPackageManager": "npm",
     "clientFramework": "react",
-    "clientTheme": "none",
+    "clientTheme": "__theme__",
     "clientThemeVariant": "",
     "testFrameworks": [],
     "jhiPrefix": "jhi",
